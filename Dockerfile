@@ -15,7 +15,7 @@ COPY prisma ./prisma/
 # Menginstall seluruh dependencies (termasuk devDependencies yang dibutuhkan untuk build)
 RUN npm install
 
-# Men-generate Prisma client agar sesuai dengan arsitektur Linux Alpine
+# Men-generate Prisma client agar sesuai dengan arsitektur Linux
 RUN npx prisma generate
 
 # Menyalin seluruh source code ke dalam container
@@ -24,8 +24,11 @@ COPY . .
 # Melakukan build TypeScript menjadi JavaScript (ke folder dist)
 RUN npm run build
 
-# Mengekspose port 3000 (sesuai pengaturan default, Railway bisa mengoverride ini)
+# Membuat folder uploads agar gambar produk bisa disimpan
+RUN mkdir -p uploads/products
+
+# Mengekspose port 3000 (Railway bisa mengoverride via env PORT)
 EXPOSE 3000
 
-# Menjalankan aplikasi
-CMD ["npm", "start"]
+# Menjalankan prisma db push (buat/update tabel) lalu start aplikasi
+CMD ["sh", "-c", "npx prisma db push --skip-generate && npm start"]

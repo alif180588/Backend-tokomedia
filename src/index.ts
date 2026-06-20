@@ -30,7 +30,25 @@ app.use('/uploads', express.static(path.resolve(__dirname, '..', 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 
-// Error Handling
+// Error Handling for API routes
+app.use('/api', errorHandler);
+
+// Serve Flutter Web static files from public/ directory
+const publicDir = path.resolve(__dirname, '..', 'public');
+if (fs.existsSync(publicDir)) {
+  app.use(express.static(publicDir));
+
+  // SPA fallback: any route that is NOT /api/* or /uploads/* returns index.html
+  // This allows Flutter Web's client-side routing to work correctly
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
+      res.sendFile(path.join(publicDir, 'index.html'));
+    }
+  });
+  logger.info(`Serving Flutter Web from: ${publicDir}`);
+}
+
+// Global error handler (must be after all routes)
 app.use(errorHandler);
 
 const PORT = env.PORT;
