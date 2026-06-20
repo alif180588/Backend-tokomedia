@@ -1,0 +1,11 @@
+{
+  "name": "Tokomedia",
+  "short_name": "Tokomedia",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#03AC0E",
+  "description": "Tokomedia Flutter commerce app.",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false
+}
