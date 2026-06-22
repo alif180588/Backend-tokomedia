@@ -16,7 +16,7 @@ COPY prisma ./prisma/
 RUN npm install
 
 # Men-generate Prisma client agar sesuai dengan arsitektur Linux
-RUN npx prisma generate
+RUN DATABASE_URL="mysql://dummy:dummy@dummy:3306/dummy" npx prisma generate
 
 # Menyalin seluruh source code ke dalam container
 COPY . .
