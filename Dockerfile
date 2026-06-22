@@ -27,7 +27,5 @@ RUN npm run build
 # Buat folder uploads
 RUN mkdir -p uploads/products
 
-EXPOSE 3000
-
 # Jalankan migrasi lalu start server
 CMD ["sh", "-c", "npx prisma db push --skip-generate && node dist/index.js"]
