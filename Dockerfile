@@ -1,34 +1,33 @@
-# Menggunakan base image Node.js versi 20 slim
 FROM node:20-slim
 
 # Install openssl yang dibutuhkan oleh Prisma
-RUN apt-get update -y && apt-get install -y openssl
-# Set working directory di dalam container
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
 WORKDIR /app
 
-# Menyalin package.json dan package-lock.json terlebih dahulu
+# Copy package files
 COPY package*.json ./
 
-# Menyalin folder prisma untuk proses generate client
-COPY prisma ./prisma/
-
-# Menginstall seluruh dependencies (termasuk devDependencies yang dibutuhkan untuk build)
+# Install semua dependencies
 RUN npm install
 
-# Men-generate Prisma client agar sesuai dengan arsitektur Linux
+# Copy prisma schema
+COPY prisma ./prisma/
+
+# Generate Prisma client (dengan dummy URL agar build tidak gagal)
 RUN DATABASE_URL="mysql://dummy:dummy@dummy:3306/dummy" npx prisma generate
 
-# Menyalin seluruh source code ke dalam container
+# Copy seluruh source code
 COPY . .
 
-# Melakukan build TypeScript menjadi JavaScript (ke folder dist)
+# Build TypeScript
 RUN npm run build
 
-# Membuat folder uploads agar gambar produk bisa disimpan
+# Buat folder uploads
 RUN mkdir -p uploads/products
 
-# Mengekspose port 3000 (Railway bisa mengoverride via env PORT)
 EXPOSE 3000
 
-# Menjalankan prisma db push (buat/update tabel) lalu start aplikasi
-CMD ["sh", "-c", "npx prisma db push --skip-generate && npm start"]
+# Jalankan migrasi lalu start server
+CMD ["sh", "-c", "npx prisma db push --skip-generate && node dist/index.js"]
