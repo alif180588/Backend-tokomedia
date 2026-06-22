@@ -17,24 +17,24 @@ export class NodemailerProvider implements OtpProvider {
     });
   }
 
-  async sendOtp(to: string, otp: string): Promise<boolean> {
+  async sendOtp(identifier: string, otp: string, purpose: 'register' | 'login'): Promise<boolean> {
     try {
       const info = await this.transporter.sendMail({
         from: `"${env.SMTP_FROM_NAME}" <${env.SMTP_FROM_ADDRESS || env.SMTP_USERNAME}>`,
-        to: to,
-        subject: "Kode Verifikasi Tokomedia Anda",
+        to: identifier,
+        subject: `Kode Verifikasi Tokomedia Anda untuk ${purpose === 'register' ? 'Pendaftaran' : 'Login'}`,
         text: `Kode OTP Anda adalah: ${otp}. JANGAN BERIKAN KODE INI KEPADA SIAPAPUN.`,
         html: `
           <div style="font-family: Arial, sans-serif; padding: 20px; text-align: center;">
             <h2 style="color: #03AC0E;">Tokomedia</h2>
-            <p>Kode Verifikasi (OTP) Anda adalah:</p>
+            <p>Kode Verifikasi (OTP) Anda untuk ${purpose === 'register' ? 'Pendaftaran' : 'Login'} adalah:</p>
             <h1 style="letter-spacing: 5px; color: #333;">${otp}</h1>
             <p style="color: #777; font-size: 12px;">PENTING: JANGAN BERIKAN kode ini kepada SIAPAPUN, termasuk pihak Tokomedia.</p>
           </div>
         `,
       });
 
-      console.log(`[Nodemailer] Successfully sent email OTP to ${to}. Message ID: ${info.messageId}`);
+      console.log(`[Nodemailer] Successfully sent email OTP to ${identifier}. Message ID: ${info.messageId}`);
       return true;
     } catch (error) {
       console.error(`[Nodemailer] Failed to send email OTP:`, error);
